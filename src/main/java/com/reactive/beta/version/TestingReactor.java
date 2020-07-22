@@ -1,69 +1,11 @@
 package com.reactive.beta.version;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
-import java.time.Duration;
-
 public class TestingReactor {
-
-    public TestingReactor(){
-        Flux<String> fruit = Flux.just("apple", "banana", "cherry", "orange", "pear");
-        fruit.subscribe( f -> System.out.println(f.toUpperCase()) );
-
-        StepVerifier
-                .create(fruit)
-                .expectNext("apple")
-                .expectNext("banana")
-                .expectNext("cherry")
-                .expectNext("orange")
-                .expectNext("pear")
-                .verifyComplete();
-
-
-    }
-
-    public void interval(){
-        Flux<Long> intervalFlux = Flux.interval(Duration.ofSeconds(2)).take(5);
-        StepVerifier.create(intervalFlux)
-                .expectNext(0l)
-                .expectNext(1l)
-                .expectNext(2l)
-                .expectNext(3l)
-                .expectNext(4l)
-                .verifyComplete();
-    }
-
-    /**
-     * this works due to the delay time among fluxes
-     * So aligns to the timing of how they are emitted
-     */
-    public void mergingFluxes(){
-        System.out.println("Merge flux");
-        Flux<String> characters = Flux.just("char1", "char2", "char3")
-                .delayElements(Duration.ofMillis(500));
-
-        Flux<String> food = Flux.just("food1", "food2", "food3")
-                .delaySubscription(Duration.ofMillis(250))
-                .delayElements(Duration.ofMillis(500));
-
-        Flux<String> merged = characters.mergeWith(food);
-        merged.subscribe(f -> System.out.println(f.toUpperCase()));
-
-        StepVerifier.create(merged)
-                .expectNext("char1")
-                .expectNext("food1")
-                .expectNext("char2")
-                .expectNext("food2")
-                .expectNext("char3")
-                .expectNext("food3")
-                .verifyComplete();
-    }
 
     //Not caring about the order, will come depending of the speed of processing
     public void mergingFluxes2(){
@@ -151,8 +93,6 @@ public class TestingReactor {
 
     public static void main(String[] args) {
         TestingReactor testingReactor = new TestingReactor();
-        testingReactor.interval();
-        testingReactor.mergingFluxes();
         testingReactor.mergingFluxes2();
         testingReactor.zippingFluxes();
         testingReactor.zippingFluxes2();
